@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Senai.InLock.WebApi.Domains;
 using Senai.InLock.WebApi.Repositories;
 using Senai.InLock.WebApi.ViewModels;
@@ -25,50 +26,36 @@ namespace Senai.InLock.WebApi.Controllers
         {
             try
             {
-                // Usuarios Usuario = UsuarioRepository.BuscarPorEmailESenhaSqlClient(login);
-                Usuarios Usuario = usuarioRepository.BuscarPorEmailESenha(login);
-                if (Usuario == null)
-                    return NotFound(new { mensagem = "Email ou senha inválidos." });
+                Usuarios usuarioBuscado = usuarioRepository.BuscarPorEmailESenha(login);
+                if (usuarioBuscado == null)
+                    return NotFound(new { mensagem = "Eita, deu ruim." });
 
-                // informacoes do usuario
                 var claims = new[]
                 {
-                    // email
-                    new Claim(JwtRegisteredClaimNames.Email, Usuario.Email),
-                    // id
-                    new Claim(JwtRegisteredClaimNames.Jti, Usuario.UsuarioId.ToString()),
-                    // é a permissão do usuário
-                    new Claim(ClaimTypes.Role, Usuario.PermissaoUsuario.Nome),
+                    new Claim(JwtRegisteredClaimNames.Email, usuarioBuscado.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, usuarioBuscado.UsuarioId.ToString()),
+                    new Claim(ClaimTypes.Role, usuarioBuscado.Permissao)
                 };
 
-                // chave que tambem esta configurada no startup
-                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("auth-chave-autenticacao"));
+                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("InLock-chave-autenticacao"));
 
-                // criptografia
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                // eh o proprio token 
                 var token = new JwtSecurityToken(
-                    // quem esta mandando e quem esta validando
-                    issuer: "Auth.WebApi",
-                    audience: "Auth.WebApi",
-                    // sao as informacoes do usuario
+                    issuer: "InLock.WebApi",
+                    audience: "InLock.WebApi",
                     claims: claims,
-                    // data de expiracao
                     expires: DateTime.Now.AddDays(30),
-                    // eh a chave
                     signingCredentials: creds);
 
-                // gerar a chave pra vocês
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token)
                 });
-
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return BadRequest(new { mensagem = "Erro." + ex.Message });
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
     }

@@ -17,7 +17,13 @@ namespace Senai.InLock.WebApi.Repositories
                 return ctx.Estudios.ToList();
             }
         }
-
+        public List<Estudios> ListarComDados()
+        {
+            using (InLock_Context ctx = new InLock_Context())
+            {
+                return ctx.Estudios.Include(x => x.Jogos).ToList();
+            }
+        }
         public void Cadastrar(Estudios estudio)
         {
             using (InLock_Context ctx = new InLock_Context())
@@ -26,19 +32,7 @@ namespace Senai.InLock.WebApi.Repositories
                 ctx.SaveChanges();
             }
         }
-        public void Atualizar(Estudios estudio)
-        {
-            using (InLock_Context ctx = new InLock_Context())
-            {
-                Estudios estudioBuscado = ctx.Estudios.Find(estudio.EstudioId);
-                estudioBuscado.NomeEstudio = estudio.NomeEstudio;
-                estudioBuscado.PaisOrigem = estudio.PaisOrigem;
-                estudioBuscado.DataCriacao = Convert.ToDateTime(estudio.PaisOrigem);
-                estudioBuscado.UsuarioId = Convert.ToInt32(estudio.UsuarioId);
-                ctx.Estudios.Update(estudioBuscado);
-                ctx.SaveChanges();
-            }
-        }
+        
         public void Deletar(int id)
         {
             using (InLock_Context ctx = new InLock_Context())
@@ -62,5 +56,27 @@ namespace Senai.InLock.WebApi.Repositories
                 return ctx.Estudios.Include(x => x.NomeEstudio).FirstOrDefault(x => x.NomeEstudio == nome);
             }
         }
+        public void Atualizar(Estudios estudio)
+        {
+            using (InLock_Context ctx = new InLock_Context())
+            {
+                Estudios estudios = ctx.Estudios.FirstOrDefault(x => x.EstudioId == estudio.EstudioId);
+                
+                estudios.NomeEstudio = estudio.NomeEstudio;
+                estudios.PaisOrigem = estudio.PaisOrigem;
+                estudios.DataCriacao = estudio.DataCriacao;
+                estudios.UsuarioId = estudio.UsuarioId;
+                ctx.Estudios.Update(estudios);
+                ctx.SaveChanges();
+            }
+        }
+        public Estudios BuscarPorNome(string nome)
+        {
+            using (InLock_Context ctx = new InLock_Context())
+            {
+                return ctx.Estudios.Find(nome);
+            }
+        }
+
     }
 }

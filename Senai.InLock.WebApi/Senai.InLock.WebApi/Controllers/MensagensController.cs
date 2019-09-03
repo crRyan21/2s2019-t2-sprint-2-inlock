@@ -15,8 +15,8 @@ namespace Senai.InLock.WebApi.Controllers
     [ApiController]
     public class MensagensController : ControllerBase
     {
-        [Authorize]
-        [HttpGet]
+        [Authorize(Roles = "ADMINISTRADOR")]
+        [HttpGet ("ADMINISTRADOR")]
         public IActionResult Mensagem()
         {
             return Ok(new { mensagem = "Sucesso" });

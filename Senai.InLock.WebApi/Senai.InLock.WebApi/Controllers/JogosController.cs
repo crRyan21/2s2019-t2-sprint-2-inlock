@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Senai.InLock.WebApi.Domains;
 using Senai.InLock.WebApi.Repositories;
+using Senai.InLock.WebApi.ViewModels;
 
 namespace Senai.InLock.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [Produces("application/json")]
     [ApiController]
-    public class EstudiosController : ControllerBase
+    public class JogosController : ControllerBase
     {
-        EstudioRepository estudioRepository = new EstudioRepository();
+        JogoRepository JogoRepository = new JogoRepository();
 
         [Authorize]
         [HttpGet]
         public IActionResult Listar()
         {
-            return Ok(estudioRepository.Listar());
+            return Ok(JogoRepository.Listar());
         }
 
         [Authorize]
@@ -30,10 +34,10 @@ namespace Senai.InLock.WebApi.Controllers
         {
             try
             {
-                Estudios estudio = estudioRepository.BuscarPorId(id);
-                if (estudio == null)
+                Jogos jogos = JogoRepository.BuscarPorId(id);
+                if (jogos == null)
                     return NotFound();
-                return Ok(estudio);
+                return Ok(jogos);
             }
             catch (Exception ex)
             {
@@ -43,11 +47,11 @@ namespace Senai.InLock.WebApi.Controllers
 
         [Authorize(Roles = "ADMINISTRADOR")]
         [HttpPost]
-        public IActionResult Cadastrar(Estudios estudio)
+        public IActionResult Cadastrar(Jogos jogos)
         {
             try
             {
-                estudioRepository.Cadastrar(estudio);
+                JogoRepository.Cadastrar(jogos);
                 return Ok();
             }
             catch (Exception ex)
@@ -62,9 +66,9 @@ namespace Senai.InLock.WebApi.Controllers
         {
             try
             {
-                if (estudioRepository.BuscarPorId(id) == null)
+                if (JogoRepository.BuscarPorId(id) == null)
                     return NotFound();
-                estudioRepository.Deletar(id);
+                JogoRepository.Deletar(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -75,14 +79,14 @@ namespace Senai.InLock.WebApi.Controllers
 
         [Authorize(Roles = "ADMINISTRADOR")]
         [HttpPut("{id}")]
-        public IActionResult Atualizar(Estudios estudio,int id)
+        public IActionResult Atualizar(Jogos estudio, int id)
         {
             try
             {
-                Estudios estudioBuscado = estudioRepository.BuscarPorId(id);
-                if (estudioBuscado == null)
+                Jogos jogoBuscado = JogoRepository.BuscarPorId(id);
+                if (jogoBuscado == null)
                     return NotFound();
-                estudioRepository.Atualizar(estudio);
+                JogoRepository.Atualizar(estudio);
                 return Ok();
             }
             catch (Exception ex)
@@ -91,31 +95,33 @@ namespace Senai.InLock.WebApi.Controllers
             }
         }
         [Authorize]
-        [HttpGet("dados")]
-        public IActionResult ListarDados()
+        [HttpGet("data")]
+        public IActionResult ListarPorData()
         {
-            return Ok(estudioRepository.ListarComDados());
+            return Ok(JogoRepository.ListarPorData());
         }
         [Authorize]
-        [HttpGet("{nome}")]
+        [HttpGet("valor")]
+        public IActionResult ListarPorValor()
+        {
+            return Ok(JogoRepository.ListarPorValor());
+        }
+        [Authorize]
+        [HttpGet]
         public IActionResult BuscarPorNome(string nome)
         {
             try
             {
-                Estudios estudios = estudioRepository.BuscarPorNome(nome);
-                if (estudios == null)
-                {
+                Jogos jogos = JogoRepository.BuscarPorNome(nome);
+                if (jogos == null)
                     return NotFound();
-                }
-                return Ok(estudios);
+                return Ok(jogos);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
-
-
 
 
     }

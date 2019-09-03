@@ -16,7 +16,7 @@ namespace Senai.InLock.WebApi.Repositories
             using ( InLock_Context ctx = new InLock_Context())
             {
                 // buscar os dados no banco e verificar se este email e senha sao validos
-                Usuarios UsuarioBuscado = ctx.Usuarios.Include(x => x.PermissaoUsuario).FirstOrDefault(x => x.Email == login.Email && x.Senha == login.Senha);
+                Usuarios UsuarioBuscado = ctx.Usuarios.FirstOrDefault(x => x.Email == login.Email && x.Senha == login.Senha);
                 // neste cenario, precisamos incluir no join a permissao, para que tenhamos acesso ao nome dela, e nao somente ao id
                 if (UsuarioBuscado == null)
                 {

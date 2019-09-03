@@ -96,7 +96,7 @@ namespace Senai.InLock.WebApi.Domains
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PermissaoUsuario)
+                entity.Property(e => e.Permissao)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

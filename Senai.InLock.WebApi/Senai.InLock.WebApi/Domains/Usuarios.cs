@@ -13,7 +13,7 @@ namespace Senai.InLock.WebApi.Domains
         public int UsuarioId { get; set; }
         public string Email { get; set; }
         public string Senha { get; set; }
-        public string PermissaoUsuario { get; set; }
+        public string Permissao { get; set; }
         
         public ICollection<Estudios> Estudios { get; set; }
     }
